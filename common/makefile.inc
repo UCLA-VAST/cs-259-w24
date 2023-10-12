@@ -4,6 +4,12 @@ ifneq (,$(wildcard /usr/local/opt/llvm/bin/clang++))
   CXXFLAGS += -I/usr/local/opt/llvm/include
   LDFLAGS  += -L/usr/local/opt/llvm/lib -lomp
   LAB2_CXX_FLAGS = -L/usr/local/opt/boost/lib -I/usr/local/opt/boost/include
+else ifneq (,$(wildcard /opt/homebrew/opt/llvm/bin/clang++))
+  CXX = /opt/homebrew/opt/llvm/bin/clang++
+  MPICH_CXX = /opt/homebrew/opt/llvm/bin/clang++
+  CXXFLAGS += -I/opt/homebrew/opt/llvm/include
+  LDFLAGS  += -L/opt/homebrew/opt/llvm/lib -lomp
+  LAB2_CXX_FLAGS = -L/usr/local/opt/boost/lib -I/usr/local/opt/boost/include
 else
   CXX = g++
   MPICH_CXX = g++
