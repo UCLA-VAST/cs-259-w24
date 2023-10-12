@@ -4,7 +4,7 @@ SRCS = lib/gemm.h lib/gemm.cpp lib/main.cpp omp.cpp omp-blocked.cpp
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-	SRCS += lib/gemm-baseline-darwin-g++.a lib/gemm-baseline-darwin-llvm.a lib/gemm-baseline-aarch64-g++.a
+	SRCS += lib/gemm-baseline-darwin-g++.a lib/gemm-baseline-darwin-llvm.a
 else
 	SRCS += lib/gemm-baseline-linux-g++.a
 endif
