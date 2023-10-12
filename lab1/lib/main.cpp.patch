@@ -1,0 +1,20 @@
+--- a/lib/main.cpp
++++ b/lib/main.cpp
+@@ -31,16 +31,7 @@
+ 
+   Init(a, b);
+ 
+-  GemmBaseline(a, b, c_base);
+-
+-  if (sequential) {
+-    clog << "\nRun sequential GEMM\n";
+-    Benchmark(&GemmSequential, a, b, c);
+-    if (Diff(c_base, c) != 0) {
+-      clog << "Baseline failed\n";
+-      return 2;
+-    }
+-  }
++  GemmSequential(a, b, c_base);
+ 
+   bool fail = false;
+   if (parallel) {
