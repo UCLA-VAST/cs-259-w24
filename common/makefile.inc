@@ -9,7 +9,7 @@ else ifneq (,$(wildcard /opt/homebrew/opt/llvm/bin/clang++))
   MPICH_CXX = /opt/homebrew/opt/llvm/bin/clang++
   CXXFLAGS += -I/opt/homebrew/opt/llvm/include
   LDFLAGS  += -L/opt/homebrew/opt/llvm/lib -lomp
-  LAB2_CXX_FLAGS = -L/usr/local/opt/boost/lib -I/usr/local/opt/boost/include
+  LAB2_CXX_FLAGS = -L/opt/homebrew/opt/boost/lib -I/opt/homebrew/opt/boost/include
 else
   CXX = g++
   MPICH_CXX = g++
