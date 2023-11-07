@@ -18,7 +18,7 @@ cnn: $(CNN_SRCS)
 	$(CXX) $(CXXFLAGS) -o $@ $(filter %.cu %.a %.o, $^)
 
 test-vadd: vadd
-	. ./params_vadd.sh; ./$<
+	. ./params.sh; ./$<
 
 vadd: $(VADD_SRCS)
 	$(CXX) $(CXXFLAGS) -o $@ $(filter %.cu %.a %.o, $^)
