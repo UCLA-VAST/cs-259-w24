@@ -96,7 +96,7 @@ void LoadData(
 }
 
 float IsError(float a, float b) {
-  return fabs((a - b) / (a + b)) > 1e-3f && fabs(a - b) > 0.05f;
+  return isnan(a) || fabs((a - b) / (a + b)) > 1e-3f && fabs(a - b) > 0.05f;
 }
 
 int Verify(
