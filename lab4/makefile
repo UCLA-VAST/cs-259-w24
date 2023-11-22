@@ -1,69 +1,37 @@
-SRCS = lib/fixed-point/cnn.h lib/fixed-point/cnn.cpp \
-	   lib/fixed-point/opencl.cpp lib/fixed-point/main.cpp
-FAST = lib/cnn.h lib/cnn.cpp lib/opencl.cpp lib/main.cpp
+CXX=g++
+LDFLAGS += # specify your library linking options here
+CXXFLAGS += -std=c++17 -O3 -DFASTSIM $(LDFLAGS)
 
-DEVICE := $(AWS_PLATFORM)
-DSA := $(basename $(notdir $(DEVICE)))
-VP := $(XILINX_VITIS)/bin/v++
-CLFLAGS = -t $(TARGET) --platform $(DEVICE) --save-temps
-LDFLAGS += -lOpenCL
+MCC=merlincc
+CMP_OPT=-d11 --attribute burst_total_size_threshold=36700160 --attribute burst_single_size_threshold=36700160 -funsafe-math-optimizations
+LNK_OPT=-d11
+CXX_INC_DIRS=-I ./ -I $(MACH_COMMON_DIR)
+KERNEL_INC_DIR=$(CXX_INC_DIRS)  -I $(XILINX_HLS)/lnx64/tools/clang-3.9/lib/gcc/x86_64-unknown-linux-gnu/4.8.2/include/ -I $(XILINX_HLS)/include/  -I /opt/merlin/sources/merlin-compiler/trunk/source-opt/include/apint_include/
 
-export OPENCL_PLATFORM = Xilinx
-export OPENCL_DEVICE = $(DSA)
+VENDOR=XILINX
+DEVICE=xilinx_u200_gen3x16_xdma_2_202110_1
+PATH_D=/opt/xilinx/platforms/$(DEVICE)/$(DEVICE).xpfm
 
-fastsim: emconfig
-	OPENCL_BINARY=cnn_fast.sw_emu.$(DSA).xclbin XCL_EMULATION_MODE=sw_emu $(MAKE) TARGET=sw_emu internal-fast
+KERNEL=cnn-krnl
+SRCS=lib/cnn.h lib/cnn.cpp lib/main.cpp lib/cnn-krnl.h cnn-krnl.cpp
 
-swsim: emconfig
-	OPENCL_BINARY=cnn.sw_emu.$(DSA).xclbin XCL_EMULATION_MODE=sw_emu $(MAKE) TARGET=sw_emu internal
-
-hwsim: emconfig
-	OPENCL_BINARY=cnn.hw_emu.$(DSA).xclbin XCL_EMULATION_MODE=hw_emu $(MAKE) TARGET=hw_emu internal
-
-cnn-krnl.rpt: cnn-krnl.cpp
-	$(MAKE) TARGET=hw cnn.hw.$(DSA).xo
-	cp _x/*/CnnKernel/CnnKernel/solution/syn/report/CnnKernel_YourCode_csynth.rpt ./cnn-krnl.rpt
-
-estimate: cnn-krnl.rpt
-	grep -m 1 -B 1 -A 4 "Latency (absolute)" ./cnn-krnl.rpt
-
-resource: cnn-krnl.rpt
-	grep -m 1 -B 1 -A 24 "== Utilization Estimates" ./cnn-krnl.rpt
-
-cnn.$(TARGET).$(DSA).xo: ./cnn-krnl.cpp
-	$(VP) $(CLFLAGS) -c -k CnnKernel -I'$(<D)' -o'$@' '$<'
-
-cnn.$(TARGET).$(DSA).xclbin: cnn.$(TARGET).$(DSA).xo
-	$(VP) $(CLFLAGS) -l $(LDCLFLAGS) --connectivity.nk CnnKernel:1 -o'$@' $(+)
-
-cnn_fast.$(TARGET).$(DSA).xo: ./cnn-krnl.cpp
-	$(VP) $(CLFLAGS) -c -k CnnKernel -I'$(<D)' -DFASTSIM -o'$@' '$<'
-
-cnn_fast.$(TARGET).$(DSA).xclbin: cnn_fast.$(TARGET).$(DSA).xo
-	$(VP) $(CLFLAGS) -l $(LDCLFLAGS) --connectivity.nk CnnKernel:1 -o'$@' $(+)
-
-emconfig: emconfig.json
-
-emconfig.json:
-	emconfigutil --platform $(DEVICE) --od .
-
-internal: cnn $(OPENCL_SOURCE) cnn.$(TARGET).$(DSA).xclbin
-	OPENCL_WORKGROUP_GLOBAL='1' OPENCL_WORKGROUP_LOCAL='1' ./$<
-
-internal-fast: cnn_fast $(OPENCL_SOURCE) cnn_fast.$(TARGET).$(DSA).xclbin
-	OPENCL_WORKGROUP_GLOBAL='1' OPENCL_WORKGROUP_LOCAL='1' ./$<
+test: cnn
+	./$<
 
 cnn: $(SRCS)
 	$(CXX) $(CXXFLAGS) -o $@ $(filter %.cpp %.a %.o, $^) $(LDFLAGS)
 
-cnn_fast: $(FAST)
-	$(CXX) $(CXXFLAGS) -o $@ $(filter %.cpp %.a %.o, $^) $(LDFLAGS)
+estimate: merlin.rpt
+	grep -m 1 -B 1 -A 3 "Cycles" merlin.rpt
+
+merlin.rpt: $(KERNEL).mco
+	$(MCC) $^ --report=estimate $(LNK_OPT) -p=$(PATH_D) --kernel_frequency 250
+
+$(KERNEL).mco: $(KERNEL).cpp
+	$(MCC) -c $^ -D $(VENDOR) -o $(KERNEL) $(CMP_OPT) -p=$(PATH_D) $(KERNEL_INC_DIR) 
 
 clean:
-	$(RM) cnn cnn.*.xo cnn.*.xclbin cnn.*.xo.* cnn.*.xclbin.* *.log v++* *.json *.xml
-	$(RM) cnn_fast cnn_fast.*.xo cnn_fast.*.xclbin cnn_fast.*.xo.* cnn_fast.*.xclbin.*
-	$(RM) -r _x
-
-#CXX = # specify your compiler here
-LDFLAGS += # specify your library linking options here
-CXXFLAGS += -std=c++11 -O3 $(LDFLAGS)
+	$(RM) merlin.rpt merlin.log
+	$(RM) cnn __merlin$(KERNEL).h lib$(KERNEL).so $(KERNEL).mco
+	$(RM) xilinx_com_hls_CnnKernel_1_0.zip
+	$(RM) -r .merlin_prj .Mer

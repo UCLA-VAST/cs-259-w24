@@ -23,23 +23,11 @@ int main(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
-  const string data_dir = argc == 2 ? string(argv[1]) + "/" : "";
+  const string data_dir = argc == 2 ? string(argv[1]) + "/" : "lib/data/";
   LoadData(data_dir, input, weight, bias);
   clog << "Invoke CNN computation kernel\n";
 
-  if (getenv("SEQUENTIAL")) {
-    const auto begin = steady_clock::now();
-    CnnSequential(input, weight, bias, output);
-    const auto end = steady_clock::now();
-
-    uint64_t run_time_us = duration_cast<microseconds>(end - begin).count();
-    float gflops = float(kNum) * kNum * kImSize * kImSize * kKernel * kKernel * 2
-                   / (run_time_us * 1e3);
-    clog << "Time: " << run_time_us * 1e-6 << " s\n";
-    clog << "Perf: " << gflops << " GFlops\n";
-  } else {
-    CnnKernel(input, weight, bias, output);
-  }
+  CnnKernel(input, weight, bias, output);
 
   int error = Verify(data_dir, output);
   if (error != 0) {
