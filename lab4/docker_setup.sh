@@ -16,7 +16,7 @@ elif [ "$ID" == "centos" ]; then
 
     source /opt/Xilinx/Vitis_HLS/2021.2/settings64.sh
     source /opt/xilinx/xrt/setup.sh
-    source /opt/merlin                                                                                                                          /sources/merlin-compiler/merlin_setting.sh
+    source /opt/merlin/sources/merlin-compiler/merlin_setting.sh
     export C_INCLUDE_PATH="/opt/Xilinx/Vitis_HLS/2021.2/include:$C_INCLUDE_PATH"
     export CPLUS_INCLUDE_PATH="/opt/Xilinx/Vitis_HLS/2021.2/include:$CPLUS_INCLUDE_PATH"
 else
