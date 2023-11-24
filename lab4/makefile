@@ -10,7 +10,12 @@ KERNEL_INC_DIR=$(CXX_INC_DIRS)  -I $(XILINX_HLS)/lnx64/tools/clang-3.9/lib/gcc/x
 
 VENDOR=XILINX
 DEVICE=xilinx_u200_gen3x16_xdma_2_202110_1
-PATH_D=/opt/xilinx/platforms/$(DEVICE)/$(DEVICE).xpfm
+ifeq ($(wildcard $(AWS_PLATFORM)),)
+    DEVICE=xilinx_u200_gen3x16_xdma_2_202110_1
+	PATH_D=/opt/xilinx/platforms/$(DEVICE)/$(DEVICE).xpfm
+else
+    PATH_D=$(AWS_PLATFORM)
+endif
 
 KERNEL=cnn-krnl
 SRCS=lib/cnn.h lib/cnn.cpp lib/main.cpp lib/cnn-krnl.h cnn-krnl.cpp
