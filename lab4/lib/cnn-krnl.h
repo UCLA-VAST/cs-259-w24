@@ -1,13 +1,6 @@
 #ifndef CNN_KRNL_H_
 #define CNN_KRNL_H_
 
-#ifdef __SYNTHESIS__
-#define fprintf(f, fmt, ...) (0)
-#define printf(fmt, ...) (0)
-#else
-#include <cstdio>
-#endif
-
 #define kNum            (256)
 #define kKernel         (5)
 #define kImSize         (224)
@@ -44,8 +37,8 @@ typedef float compute_t;
 
 #else
 
-#include "ap_fixed.h"
-#include "ap_int.h"
+// #include "ap_fixed.h"
+// #include "ap_int.h"
 
 // These code are the actual code used for for hardware generation.
 

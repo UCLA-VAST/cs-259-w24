@@ -38,7 +38,7 @@ void CnnKernel(
   for (int i = 0; i < kNum; ++i) {
     for (int h = 0; h < kImSize; ++h) {
       for (int w = 0; w < kImSize; ++w) {
-        C[i][h][w] = max((compute_t)0, C[i][h][w]);
+        C[i][h][w] = max(0, C[i][h][w]);
       }
     }
   }
