@@ -1,3 +1,9 @@
+.Mer/
 .merlin_prj/
 .log_tmp
+__merlincnn-krnl.h
+cnn
+cnn-krnl.mco
+libcnn-krnl.so
+xilinx_com_hls_CnnKernel_1_0.zip
 merlin.log
