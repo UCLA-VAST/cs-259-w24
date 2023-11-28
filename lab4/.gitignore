@@ -1,9 +1,11 @@
 .Mer/
 .merlin_prj/
 .log_tmp
-__merlincnn-krnl.h
+__merlin*.h
 cnn
-cnn-krnl.mco
-libcnn-krnl.so
-xilinx_com_hls_CnnKernel_1_0.zip
+vadd
+dotprod
+*.mco
+*.so
+xilinx_com_hls_*.zip
 merlin.log

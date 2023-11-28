@@ -17,26 +17,33 @@ else
     PATH_D=$(AWS_PLATFORM)
 endif
 
-KERNEL=cnn-krnl
-SRCS=lib/cnn.h lib/cnn.cpp lib/main.cpp lib/cnn-krnl.h cnn-krnl.cpp
+KERNEL ?= cnn
+ifeq ($(KERNEL), cnn)
+	SRCS=lib/cnn.h lib/cnn.cpp lib/main.cpp lib/cnn-krnl.h cnn-krnl.cpp
+	KERNEL_FILE=cnn-krnl.cpp
+else
+	SRCS=lib/$(KERNEL)-krnl.h lib/$(KERNEL)-krnl.cpp lib/$(KERNEL)-main.cpp
+	KERNEL_FILE=lib/$(KERNEL)-krnl.cpp
+endif
 
-test: cnn
+test: $(KERNEL)
 	./$<
 
-cnn: $(SRCS)
+$(KERNEL): $(SRCS)
 	$(CXX) $(CXXFLAGS) -o $@ $(filter %.cpp %.a %.o, $^) $(LDFLAGS)
 
 estimate: merlin.rpt
 	grep -m 1 -B 1 -A 3 "Cycles" merlin.rpt
 
-merlin.rpt: $(KERNEL).mco
+merlin.rpt: $(KERNEL)-krnl.mco
 	$(MCC) $^ --report=estimate $(LNK_OPT) -p=$(PATH_D) --kernel_frequency 250
 
-$(KERNEL).mco: $(KERNEL).cpp
-	$(MCC) -c $^ -D $(VENDOR) -o $(KERNEL) $(CMP_OPT) -p=$(PATH_D) $(KERNEL_INC_DIR) 
+$(KERNEL)-krnl.mco: $(KERNEL_FILE)
+	$(MCC) -c $^ -D $(VENDOR) -o $(KERNEL)-krnl $(CMP_OPT) -p=$(PATH_D) $(KERNEL_INC_DIR) 
 
 clean:
 	$(RM) merlin.rpt merlin.log
-	$(RM) cnn __merlin$(KERNEL).h lib$(KERNEL).so $(KERNEL).mco
-	$(RM) xilinx_com_hls_CnnKernel_1_0.zip
+	$(RM) cnn vadd dotprod
+	$(RM) __merlin*.h *.so *.mco
+	$(RM) xilinx_com_hls_*.zip
 	$(RM) -r .merlin_prj .Mer
