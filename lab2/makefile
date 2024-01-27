@@ -42,8 +42,8 @@ csim:
 	sudo chmod -R 777 .
 	ulimit -s unlimited
 	cp __merlinkernel_CnnKernel_tb.cpp .merlin_prj/run/implement/exec/hls/__merlinkernel_CnnKernel_tb.cpp
-	cp csim.tcl .merlin_prj/run/implement/exec/hls/_x/CnnKernel/CnnKernel/csim.tcl
-	vitis_hls .merlin_prj/run/implement/exec/hls/_x/CnnKernel/CnnKernel/csim.tcl
+	g++ -O3 .merlin_prj/run/implement/exec/hls/__merlinkernel_CnnKernel_tb.cpp .merlin_prj/run/implement/exec/hls/__merlinkernel_CnnKernel.cpp -I/tools/Xilinx/Vitis_HLS/2023.1/include
+	./a.out
 
 merlin.rpt: $(KERNEL)-krnl.mco
 	$(MCC) $^ --report=estimate $(LNK_OPT) -p=$(PATH_D) --kernel_frequency 250
