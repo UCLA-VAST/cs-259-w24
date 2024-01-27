@@ -38,6 +38,13 @@ estimate: merlin.rpt
 estimate_hls:
 	vitis_hls .merlin_prj/run/implement/exec/hls/_x/CnnKernel/CnnKernel/CnnKernel.tcl
 
+csim:
+	sudo chmod -R 777 .
+	ulimit -s unlimited
+	cp __merlinkernel_CnnKernel_tb.cpp .merlin_prj/run/implement/exec/hls/__merlinkernel_CnnKernel_tb.cpp
+	cp csim.tcl .merlin_prj/run/implement/exec/hls/_x/CnnKernel/CnnKernel/csim.tcl
+	vitis_hls .merlin_prj/run/implement/exec/hls/_x/CnnKernel/CnnKernel/csim.tcl
+
 merlin.rpt: $(KERNEL)-krnl.mco
 	$(MCC) $^ --report=estimate $(LNK_OPT) -p=$(PATH_D) --kernel_frequency 250
 
