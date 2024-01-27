@@ -35,6 +35,9 @@ $(KERNEL): $(SRCS)
 estimate: merlin.rpt
 	grep -m 1 -B 1 -A 3 "Cycles" merlin.rpt
 
+estimate_hls:
+	vitis_hls .merlin_prj/run/implement/exec/hls/_x/CnnKernel/CnnKernel/CnnKernel.tcl
+
 merlin.rpt: $(KERNEL)-krnl.mco
 	$(MCC) $^ --report=estimate $(LNK_OPT) -p=$(PATH_D) --kernel_frequency 250
 
