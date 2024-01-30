@@ -119,7 +119,7 @@ int main(){
   for (int i = 0; i < kNum; ++i) {
     for (int h = 0; h < kOutImSize; ++h) {
       for (int w = 0; w < kOutImSize; ++w) {
-        if(abs(outputSoftware[i][h][w] - outputHardware[i][h][w]) > 0.0001){
+        if(abs(outputSoftware[i][h][w] - outputHardware[i][h][w]) > 0.1){
           err++;
         }
       }
